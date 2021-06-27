@@ -1,2 +1,2 @@
-.husky/ linguist-vendored
+.husky/* linguist-vendored
 jest.config.js linguist-vendored

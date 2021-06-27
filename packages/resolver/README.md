@@ -4,13 +4,11 @@
 
 - resolver `resolver: (fn: ResolverFn) => ResolverFn`
 
-<!--
 ![version](https://img.shields.io/npm/v/@ev-graphql/resolver)
 ![node](https://img.shields.io/node/v/@ev-graphql/resolver)
 ![downloads](https://img.shields.io/npm/dw/@ev-graphql/resolver)
 ![dependencies](https://img.shields.io/david/eliseuvideira/ev-graphql?path=packages%2Fresolver)
 [![github](https://img.shields.io/github/stars/eliseuvideira/ev-graphql?style=social)](https://github.com/eliseuvideira/ev-graphql)
--->
 
 ## Install
 

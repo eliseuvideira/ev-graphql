@@ -1,0 +1,25 @@
+{
+  "name": "@ev-graphql/subscription",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "lib/**/*"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": "git@github.com:eliseuvideira/ev-graphql.git",
+  "dependencies": {},
+  "devDependencies": {
+    "graphql": "^15.5.1"
+  },
+  "peerDependencies": {
+    "graphql": "^15.5.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "rm -rf lib && yarn build"
+  }
+}

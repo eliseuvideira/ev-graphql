@@ -1,2 +1,3 @@
-.husky/* linguist-vendored
+.husky/pre-commit linguist-vendored
+.husky/pre-push linguist-vendored
 jest.config.js linguist-vendored

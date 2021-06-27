@@ -6,6 +6,27 @@
   "license": "MIT",
   "private": true,
   "dependencies": {},
-  "devDependencies": {},
-  "scripts": {}
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "eslint": "^7.29.0",
+    "husky": "^6.0.0",
+    "jest": "^27.0.5",
+    "lerna": "^4.0.0",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.4"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "clean": "lerna clean",
+    "coverage": "jest --coverage && xdg-open coverage/lcov-report/index.html &>/dev/null",
+    "format": "prettier --write 'packages/*/src/**'",
+    "lint": "eslint --max-warnings=0 'packages/*/src/**'",
+    "test": "jest",
+    "watch": "jest --watch",
+    "prepare": "husky install"
+  }
 }

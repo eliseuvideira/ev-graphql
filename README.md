@@ -11,4 +11,4 @@
 
 ## Packages
 
-### - [resolver](packages/resolver/README.md)
+### - [resolver](packages/resolver)

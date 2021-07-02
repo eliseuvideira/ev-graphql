@@ -9,6 +9,7 @@ import { PubSub } from "graphql-subscriptions";
 import { graphqlUploadExpress, UploadOptions } from "graphql-upload";
 import { Server } from "http";
 import { formatError } from "./formatError";
+import { typeDefs as rootTypeDefs } from "../typeDefs";
 
 export interface CreateApolloProps<TContext>
   extends Omit<
@@ -36,7 +37,7 @@ export const createApollo = <TContext>({
   const pubsub = new PubSub();
 
   const server = new ApolloServer({
-    typeDefs,
+    typeDefs: [rootTypeDefs, ...(typeDefs || [])],
     resolvers,
     context: { ...context, pubsub },
     formatError,

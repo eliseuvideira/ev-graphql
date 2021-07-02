@@ -24,6 +24,7 @@ export const createApollo = <TContext>({
   typeDefs,
   resolvers,
   context,
+  playground,
 }: CreateApolloProps<TContext>) => {
   const pubsub = new PubSub();
 
@@ -34,7 +35,10 @@ export const createApollo = <TContext>({
     formatError,
     uploads: false,
     introspection: true,
-    playground: true,
+    playground:
+      typeof playground !== "undefined"
+        ? playground
+        : { settings: { "request.credentials": "include" } },
   });
 
   const middleware = () => server.getMiddleware({ cors: false });

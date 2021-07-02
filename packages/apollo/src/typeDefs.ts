@@ -12,7 +12,7 @@ export const typeDefs = gql`
     _empty: Boolean
   }
 
-  type subscriptions {
+  type Subscriptions {
     _empty: Boolean
   }
 `;

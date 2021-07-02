@@ -39,7 +39,7 @@ export const createApollo = <TContext>({
   const server = new ApolloServer({
     typeDefs: [rootTypeDefs, ...(typeDefs || [])],
     resolvers,
-    context: { ...context, pubsub },
+    context: async (args) => ({ ...context, ...args, pubsub }),
     formatError,
     uploads: false,
     introspection: typeof introspection !== "undefined" ? introspection : true,

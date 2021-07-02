@@ -1,0 +1,30 @@
+{
+  "name": "@ev-graphql/validation",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "lib/**/*"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": "git@github.com:eliseuvideira/ev-graphql.git",
+  "dependencies": {
+    "@ev-graphql/resolver": "^0.3.0"
+  },
+  "devDependencies": {
+    "apollo-server-express": "^2.25.2",
+    "graphql": "^15.5.1",
+    "joi": "^17.4.0"
+  },
+  "peerDependencies": {
+    "graphql": "^15.5.1",
+    "joi": "^17.4.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "rm -rf lib && yarn build"
+  }
+}

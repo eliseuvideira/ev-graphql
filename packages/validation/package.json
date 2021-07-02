@@ -20,8 +20,8 @@
     "joi": "^17.4.0"
   },
   "peerDependencies": {
-    "graphql": "^15.5.1",
-    "joi": "^17.4.0"
+    "graphql": ">=15",
+    "joi": ">=17"
   },
   "scripts": {
     "build": "tsc",

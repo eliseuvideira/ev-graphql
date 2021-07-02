@@ -21,9 +21,9 @@
     "graphql-subscriptions": "^1.2.1"
   },
   "peerDependencies": {
-    "apollo-server-express": "^2.25.2",
-    "graphql": "^15.5.1",
-    "graphql-subscriptions": "^1.2.1"
+    "apollo-server-express": ">=2.25",
+    "graphql": ">=15.5",
+    "graphql-subscriptions": ">=1.2"
   },
   "scripts": {
     "build": "tsc",

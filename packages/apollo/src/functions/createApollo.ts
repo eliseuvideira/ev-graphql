@@ -12,8 +12,14 @@ import { formatError } from "./formatError";
 
 export interface CreateApolloProps<TContext>
   extends Omit<
-    Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
-    "context"
+    Omit<
+      Omit<
+        Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
+        "context"
+      >,
+      "formatError"
+    >,
+    "uploads"
   > {
   typeDefs?: DocumentNode[];
   resolvers?: IResolvers[];
@@ -24,6 +30,7 @@ export const createApollo = <TContext>({
   typeDefs,
   resolvers,
   context,
+  introspection,
   playground,
 }: CreateApolloProps<TContext>) => {
   const pubsub = new PubSub();
@@ -34,7 +41,7 @@ export const createApollo = <TContext>({
     context: { ...context, pubsub },
     formatError,
     uploads: false,
-    introspection: true,
+    introspection: typeof introspection !== "undefined" ? introspection : true,
     playground:
       typeof playground !== "undefined"
         ? playground

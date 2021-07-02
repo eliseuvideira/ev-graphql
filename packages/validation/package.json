@@ -20,8 +20,9 @@
     "joi": "^17.4.0"
   },
   "peerDependencies": {
-    "graphql": ">=15",
-    "joi": ">=17"
+    "apollo-server-express": ">=2.25",
+    "graphql": ">=15.5",
+    "joi": ">=17.4"
   },
   "scripts": {
     "build": "tsc",

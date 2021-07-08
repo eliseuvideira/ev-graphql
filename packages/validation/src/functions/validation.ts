@@ -7,9 +7,6 @@ export const validation = (schema: Joi.ObjectSchema) =>
     let parsed: Record<string, any>;
     try {
       parsed = await schema.validateAsync(args);
-      for (const key of Object.keys(args)) {
-        delete args[key];
-      }
       for (const key of Object.keys(parsed)) {
         args[key] = parsed[key];
       }

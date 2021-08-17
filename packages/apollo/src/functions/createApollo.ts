@@ -37,7 +37,11 @@ export interface CreateApolloProps<T extends ExpressContext>
   cors?: boolean;
 }
 
-export const createApollo = <T extends ExpressContext>({
+export interface CreateApolloBaseContext extends ExpressContext {
+  pubsub: PubSub;
+}
+
+export const createApollo = <T extends CreateApolloBaseContext>({
   typeDefs,
   resolvers,
   context = {},
@@ -51,7 +55,7 @@ export const createApollo = <T extends ExpressContext>({
     resolvers,
   });
 
-  const server = new ApolloServer({
+  const server = new ApolloServer<T>({
     schema,
     context: createContext(context, pubsub),
     formatError,

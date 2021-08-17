@@ -31,7 +31,7 @@ export interface CreateApolloProps<T extends ExpressContext>
 export const createApollo = <T extends ExpressContext>({
   typeDefs,
   resolvers,
-  context,
+  context = {},
   introspection,
   ...props
 }: CreateApolloProps<T>) => {

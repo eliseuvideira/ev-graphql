@@ -33,7 +33,7 @@ export interface CreateApolloProps<T extends ExpressContext>
     UploadOptions {
   resolvers: IResolvers[];
   typeDefs: DocumentNode[];
-  context?: Record<string, any> | ContextFunction<T>;
+  context?: Partial<T> | ContextFunction<Partial<T>>;
   cors?: boolean;
 }
 

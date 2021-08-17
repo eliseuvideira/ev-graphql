@@ -57,12 +57,6 @@ export const createApollo = <T extends ExpressContext>({
     ...props,
   });
 
-  ["SIGINT", "SIGTERM"].forEach((signal) => {
-    process.on(signal, async () => {
-      await server.stop();
-    });
-  });
-
   const middleware = () => server.getMiddleware({ cors: false });
 
   const upload = (options?: UploadOptions) => graphqlUploadExpress(options);

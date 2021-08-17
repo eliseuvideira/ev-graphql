@@ -15,11 +15,8 @@ export const createSubscriptions =
       path: apolloServer.graphqlPath,
     });
 
-    ["SIGINT", "SIGTERM"].forEach((signal) => {
-      process.on(signal, async () => {
-        subscriptionServer.close();
-        await apolloServer.stop();
-      });
+    httpServer.on("close", () => {
+      subscriptionServer.close();
     });
 
     return subscriptionServer;

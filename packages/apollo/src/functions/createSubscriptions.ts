@@ -16,7 +16,10 @@ export const createSubscriptions =
     });
 
     ["SIGINT", "SIGTERM"].forEach((signal) => {
-      process.on(signal, () => subscriptionServer.close());
+      process.on(signal, async () => {
+        subscriptionServer.close();
+        await apolloServer.stop();
+      });
     });
 
     return subscriptionServer;

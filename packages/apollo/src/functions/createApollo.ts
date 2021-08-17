@@ -58,8 +58,8 @@ export const createApollo = <T extends ExpressContext>({
   });
 
   ["SIGINT", "SIGTERM"].forEach((signal) => {
-    process.on(signal, () => {
-      server.stop();
+    process.on(signal, async () => {
+      await server.stop();
     });
   });
 

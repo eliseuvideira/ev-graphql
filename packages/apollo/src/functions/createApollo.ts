@@ -10,7 +10,10 @@ import { formatError } from "./formatError";
 import { typeDefs as rootTypeDefs } from "../typeDefs";
 import { createSubscriptions } from "./createSubscriptions";
 import { IResolvers } from "@graphql-tools/utils";
-import { ContextFunction } from "apollo-server-core";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ContextFunction,
+} from "apollo-server-core";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createContext } from "./createContext";
 
@@ -46,6 +49,7 @@ export const createApollo = <T extends ExpressContext>({
     schema,
     context: createContext(context, pubsub),
     formatError,
+    plugins: [ApolloServerPluginLandingPageDisabled()],
     introspection:
       typeof introspection !== "undefined"
         ? introspection

@@ -3,7 +3,7 @@ import {
   ExpressContext,
   ApolloServerExpressConfig,
 } from "apollo-server-express";
-import { DocumentNode } from "graphql";
+import { DocumentNode, GraphQLFieldResolver } from "graphql";
 import { PubSub } from "graphql-subscriptions";
 import { graphqlUploadExpress, UploadOptions } from "graphql-upload";
 import { formatError } from "./formatError";
@@ -21,6 +21,12 @@ export type CreateApolloBaseProps = Omit<
   Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
   "context"
 >;
+
+export type ResolverFn<
+  TSource = any,
+  TContext = any,
+  TArgs = Record<string, any>,
+> = GraphQLFieldResolver<TSource, TContext, TArgs>;
 
 export interface CreateApolloProps<T extends ExpressContext>
   extends CreateApolloBaseProps,
@@ -63,10 +69,25 @@ export const createApollo = <T extends ExpressContext>({
 
   const subscriptions = createSubscriptions(server);
 
+  const createResolverHandler =
+    <TSource = any, TContext = T, TArgs = Record<string, any>>() =>
+    (
+      ...fns: ResolverFn<TSource, TContext, TArgs>[]
+    ): ResolverFn<TSource, TContext, TArgs> =>
+    async (source, args, ctx, info) => {
+      for (const fn of fns) {
+        const value = await fn(source, args, ctx, info);
+        if (value != null) {
+          return value;
+        }
+      }
+    };
+
   return {
     server,
     middleware,
     upload,
     subscriptions,
+    createResolverHandler,
   };
 };

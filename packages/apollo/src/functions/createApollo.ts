@@ -1,60 +1,63 @@
 import {
   ApolloServer,
-  IResolvers,
   ExpressContext,
   ApolloServerExpressConfig,
 } from "apollo-server-express";
 import { DocumentNode } from "graphql";
 import { PubSub } from "graphql-subscriptions";
 import { graphqlUploadExpress, UploadOptions } from "graphql-upload";
-import { Server } from "http";
 import { formatError } from "./formatError";
 import { typeDefs as rootTypeDefs } from "../typeDefs";
+import { createSubscriptions } from "./createSubscriptions";
+import { IResolvers } from "@graphql-tools/utils";
+import { ContextFunction } from "apollo-server-core";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { createContext } from "./createContext";
 
-export interface CreateApolloProps<TContext>
-  extends Omit<
-    Omit<
-      Omit<
-        Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
-        "context"
-      >,
-      "formatError"
-    >,
-    "uploads"
-  > {
-  typeDefs?: DocumentNode[];
-  resolvers?: IResolvers[];
-  context?: TContext & ExpressContext & { pubsub: PubSub };
+export type CreateApolloBaseProps = Omit<
+  Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
+  "context"
+>;
+
+export interface CreateApolloProps<T extends ExpressContext>
+  extends CreateApolloBaseProps,
+    UploadOptions {
+  resolvers: IResolvers[];
+  typeDefs: DocumentNode[];
+  context: Record<string, any> | ContextFunction<T>;
+  cors?: boolean;
 }
 
-export const createApollo = <TContext>({
+export const createApollo = <T extends ExpressContext>({
   typeDefs,
   resolvers,
   context,
   introspection,
-  playground,
-}: CreateApolloProps<TContext>) => {
+  ...props
+}: CreateApolloProps<T>) => {
   const pubsub = new PubSub();
 
-  const server = new ApolloServer({
-    typeDefs: [rootTypeDefs, ...(typeDefs || [])],
+  const schema = makeExecutableSchema({
+    typeDefs: [rootTypeDefs, ...typeDefs],
     resolvers,
-    context: async (args) => ({ ...context, ...args, pubsub }),
+  });
+
+  const server = new ApolloServer({
+    schema,
+    context: createContext(context, pubsub),
     formatError,
-    uploads: false,
-    introspection: typeof introspection !== "undefined" ? introspection : true,
-    playground:
-      typeof playground !== "undefined"
-        ? playground
-        : { settings: { "request.credentials": "include" } },
+    introspection:
+      typeof introspection !== "undefined"
+        ? introspection
+        : process.env.NODE_ENV !== "production",
+    ...props,
   });
 
   const middleware = () => server.getMiddleware({ cors: false });
 
   const upload = (options?: UploadOptions) => graphqlUploadExpress(options);
 
-  const subscriptions = (srv: Server) =>
-    server.installSubscriptionHandlers(srv);
+  const subscriptions = createSubscriptions(server);
 
   return {
     server,

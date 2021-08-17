@@ -12,18 +12,25 @@
   },
   "repository": "git@github.com:eliseuvideira/ev-graphql.git",
   "dependencies": {
-    "@types/graphql-upload": "^8.0.5",
-    "graphql-upload": "^12.0.0"
+    "@graphql-tools/schema": "^8.1.1",
+    "@graphql-tools/utils": "^8.1.1",
+    "@types/graphql-upload": "^8.0.6",
+    "@types/ws": "^7.4.7",
+    "graphql-subscriptions": "^1.2.1",
+    "graphql-upload": "^12.0.0",
+    "subscriptions-transport-ws": "^0.9.19"
   },
   "devDependencies": {
-    "apollo-server-express": "^2.25.2",
-    "graphql": "^15.5.1",
-    "graphql-subscriptions": "^1.2.1"
+    "apollo-server-core": "^3.1.2",
+    "apollo-server-express": "^3.1.2",
+    "express": "^4.17.1",
+    "graphql": "^15.5.1"
   },
   "peerDependencies": {
-    "apollo-server-express": ">=2.25",
-    "graphql": ">=15.5",
-    "graphql-subscriptions": ">=1.2"
+    "apollo-server-core": "^3.1.2",
+    "apollo-server-express": ">=3.1",
+    "express": ">=4.17",
+    "graphql": ">=15.5"
   },
   "scripts": {
     "build": "tsc",

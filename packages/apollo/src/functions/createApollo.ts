@@ -10,10 +10,7 @@ import { formatError } from "./formatError";
 import { typeDefs as rootTypeDefs } from "../typeDefs";
 import { createSubscriptions } from "./createSubscriptions";
 import { IResolvers } from "@graphql-tools/utils";
-import {
-  ApolloServerPluginLandingPageDisabled,
-  ContextFunction,
-} from "apollo-server-core";
+import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createContext } from "./createContext";
 
@@ -28,20 +25,20 @@ export type ResolverFn<
   TArgs = Record<string, any>,
 > = GraphQLFieldResolver<TSource, TContext, TArgs>;
 
-export interface CreateApolloProps<T extends ExpressContext>
-  extends CreateApolloBaseProps,
-    UploadOptions {
-  resolvers: IResolvers[];
-  typeDefs: DocumentNode[];
-  context?: Partial<T> | ContextFunction<Partial<T>>;
-  cors?: boolean;
-}
-
 export interface CreateApolloBaseContext extends ExpressContext {
   pubsub: PubSub;
 }
 
-export const createApollo = <T extends CreateApolloBaseContext>({
+export interface CreateApolloProps<T>
+  extends CreateApolloBaseProps,
+    UploadOptions {
+  resolvers: IResolvers[];
+  typeDefs: DocumentNode[];
+  context?: Partial<T> | ((context: Partial<T & CreateApolloBaseContext>) => T);
+  cors?: boolean;
+}
+
+export const createApollo = <T>({
   typeDefs,
   resolvers,
   context = {},
@@ -55,7 +52,7 @@ export const createApollo = <T extends CreateApolloBaseContext>({
     resolvers,
   });
 
-  const server = new ApolloServer<T>({
+  const server = new ApolloServer<T & ExpressContext>({
     schema,
     context: createContext(context, pubsub),
     formatError,
@@ -74,10 +71,15 @@ export const createApollo = <T extends CreateApolloBaseContext>({
   const subscriptions = createSubscriptions(server);
 
   const createResolverHandler =
-    <TSource = any, TContext = T, TArgs = Record<string, any>>() =>
-    (
-      ...fns: ResolverFn<TSource, TContext, TArgs>[]
-    ): ResolverFn<TSource, TContext, TArgs> =>
+    () =>
+    <
+      TSource = any,
+      TArgs = Record<string, any>,
+      TAdditionalProps extends T &
+        CreateApolloBaseContext = CreateApolloBaseContext & T,
+    >(
+      ...fns: ResolverFn<TSource, TAdditionalProps, TArgs>[]
+    ): ResolverFn<TSource, TAdditionalProps, TArgs> =>
     async (source, args, ctx, info) => {
       for (const fn of fns) {
         const value = await fn(source, args, ctx, info);

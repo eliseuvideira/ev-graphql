@@ -1,4 +1,5 @@
-import { resolver, ResolverFn } from "../src/index";
+import { ExpressContext } from "apollo-server-express";
+import { createResolver, resolver, Resolver } from "../src/index";
 
 describe("resolver", () => {
   it("creates a resolver function", async () => {
@@ -24,10 +25,10 @@ describe("resolver", () => {
 
     const order: any[] = [];
 
-    const fn1: ResolverFn = jest.fn(() => {
+    const fn1: Resolver = jest.fn(() => {
       order.push(fn1);
     });
-    const fn2: ResolverFn = jest.fn(() => {
+    const fn2: Resolver = jest.fn(() => {
       order.push(fn2);
     });
 
@@ -54,8 +55,8 @@ describe("resolver", () => {
 
     const value = {};
 
-    const fn1: ResolverFn = jest.fn(() => value);
-    const fn2: ResolverFn = jest.fn();
+    const fn1: Resolver = jest.fn(() => value);
+    const fn2: Resolver = jest.fn();
 
     const instance = resolver(fn1, fn2);
 
@@ -77,10 +78,10 @@ describe("resolver", () => {
 
     const error = new Error("failed");
 
-    const fn1: ResolverFn = jest.fn(async () => {
+    const fn1: Resolver = jest.fn(async () => {
       throw error;
     });
-    const fn2: ResolverFn = jest.fn();
+    const fn2: Resolver = jest.fn();
 
     const instance = resolver(fn1, fn2);
 
@@ -107,8 +108,8 @@ describe("resolver", () => {
 
     const instance = resolver<
       { id: number },
-      { pubsub: any },
-      { value: number }
+      { value: number },
+      { req: any; res: any; pubsub: any }
     >((source, args, context, info) => {
       expect(source.id).toBeDefined();
       expect(args.value).toBeDefined();
@@ -120,8 +121,74 @@ describe("resolver", () => {
     await instance(
       { id: Math.random() },
       { value: Math.random() },
-      { pubsub: {} },
-      { fieldName: "id" } as any
+      { pubsub: {}, req: {}, res: {} },
+      { fieldName: "id" } as any,
+    );
+
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("createResolver", () => {
+  it("creates a function that creates a resolver function", async () => {
+    interface CustomContext extends ExpressContext {
+      pubsub: any;
+    }
+
+    const resolver = createResolver<CustomContext>();
+
+    expect.assertions(2);
+
+    const fn = jest.fn();
+
+    const instance = resolver(fn);
+
+    const parent = {} as any;
+    const args = {} as any;
+    const context = {};
+    const info = {} as any;
+
+    await instance(parent, args, context, info);
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(parent, args, context, info);
+  });
+
+  it("allows better intellisense", async () => {
+    interface CustomContext extends ExpressContext {
+      pubsub: any;
+    }
+
+    interface CustomSource {
+      id: number;
+    }
+
+    interface CustomArgs {
+      value: number;
+    }
+
+    const resolver = createResolver<CustomContext>();
+
+    expect.assertions(5);
+
+    const fn = jest.fn();
+
+    const instance = resolver<CustomSource, CustomArgs>(
+      (source, args, context, info) => {
+        expect(source.id).toBeDefined();
+        expect(args.value).toBeDefined();
+        expect(context.pubsub).toBeDefined();
+        expect(info.fieldName).toBeDefined();
+        fn();
+        return 1;
+      },
+    );
+
+    await instance(
+      { id: Math.random() },
+      { value: Math.random() },
+      { pubsub: {}, req: {} as any, res: {} as any },
+      { fieldName: "id" } as any,
     );
 
     expect(fn).toHaveBeenCalledTimes(1);

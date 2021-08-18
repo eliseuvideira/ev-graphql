@@ -1,12 +1,9 @@
 import { ExpressContext } from "apollo-server-express";
 import { Resolver } from "../types/Resolver";
 
-export const resolver =
-  <
-    Source = null,
-    Args = Record<string, any>,
-    Context extends ExpressContext = ExpressContext,
-  >(
+export const createResolver =
+  <T extends ExpressContext = ExpressContext>() =>
+  <Source = null, Args = Record<string, any>, Context extends T = T>(
     ...fns: Resolver<Source, Context, Args>[]
   ): Resolver<Source, Context, Args> =>
   async (source, args, ctx, info) => {

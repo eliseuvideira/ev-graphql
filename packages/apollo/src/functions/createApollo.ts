@@ -3,7 +3,7 @@ import {
   ExpressContext,
   ApolloServerExpressConfig,
 } from "apollo-server-express";
-import { DocumentNode, GraphQLFieldResolver } from "graphql";
+import { DocumentNode } from "graphql";
 import { PubSub } from "graphql-subscriptions";
 import { graphqlUploadExpress, UploadOptions } from "graphql-upload";
 import { formatError } from "./formatError";
@@ -19,29 +19,27 @@ export type CreateApolloBaseProps = Omit<
   "context"
 >;
 
-export type ResolverFn<
-  TSource = any,
-  TContext = any,
-  TArgs = Record<string, any>,
-> = GraphQLFieldResolver<TSource, TContext, TArgs>;
-
-export interface CreateApolloBaseContext extends ExpressContext {
+export interface ApolloContext extends ExpressContext {
   pubsub: PubSub;
 }
 
-export interface CreateApolloProps<T>
+export type CustomContext<T extends ApolloContext = ApolloContext> = Omit<
+  Omit<Omit<T, "req">, "res">,
+  "pubsub"
+>;
+
+export interface CreateApolloProps<T extends ApolloContext = ApolloContext>
   extends CreateApolloBaseProps,
     UploadOptions {
   resolvers: IResolvers[];
   typeDefs: DocumentNode[];
-  context?: Partial<T> | ((context: Partial<T & CreateApolloBaseContext>) => T);
-  cors?: boolean;
+  context?: CustomContext<T> | ((context: T) => T);
 }
 
-export const createApollo = <T>({
+export const createApollo = <T extends ApolloContext = ApolloContext>({
   typeDefs,
   resolvers,
-  context = {},
+  context = {} as CustomContext<T>,
   introspection,
   ...props
 }: CreateApolloProps<T>) => {
@@ -70,30 +68,10 @@ export const createApollo = <T>({
 
   const subscriptions = createSubscriptions(server);
 
-  const createResolverHandler =
-    () =>
-    <
-      TSource = any,
-      TArgs = Record<string, any>,
-      TAdditionalProps extends T &
-        CreateApolloBaseContext = CreateApolloBaseContext & T,
-    >(
-      ...fns: ResolverFn<TSource, TAdditionalProps, TArgs>[]
-    ): ResolverFn<TSource, TAdditionalProps, TArgs> =>
-    async (source, args, ctx, info) => {
-      for (const fn of fns) {
-        const value = await fn(source, args, ctx, info);
-        if (value != null) {
-          return value;
-        }
-      }
-    };
-
   return {
     server,
     middleware,
     upload,
     subscriptions,
-    createResolverHandler,
   };
 };
